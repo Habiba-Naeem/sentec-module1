@@ -1,10 +1,15 @@
-from flask import Flask, session, render_template, request, url_for
+from flask import Flask, session, render_template, request, url_for, flash, redirect
+from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from sqlalchemy_utils import *
+import psycopg2
 app = Flask(__name__)
 
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://mownmbfgyxlpek:4b3ea0e203756ef6eecd8c5393123945d7757f95b6540b59a05656d1ea18b675@ec2-184-73-198-174.compute-1.amazonaws.com:5432/d83s5570udk9do'
+Session(app)
 db = SQLAlchemy(app)
 
 class User(db.Model):
@@ -53,10 +58,19 @@ def submit():
         reason = request.form.get("reason")
         department = request.form.get("department")
 
-        user = User(first_name = first_name, last_name = last_name, email = email,
-        past_experience = past_experience, reason = reason, phone_number = phone_number, 
-        department = department, year = year, domain = domain)
-        db.session.add(user)
-        db.session.commit()
+        try:
+            user = User(first_name = first_name, last_name = last_name, email = email,
+            past_experience = past_experience, reason = reason, phone_number = phone_number, 
+            department = department, year = year, domain = domain)
+            db.session.add(user)
+            db.session.commit()
+            return "Registration Successful"
+        except Exception as e:
+            print(e)
+            flash("Email already exists", "danger")
+        
+        return redirect(url_for('hello_world'))
 
-        return render_template("index.html")
+
+if __name__ == '__main__':
+    app.run(debug=True)

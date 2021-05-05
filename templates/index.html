@@ -29,6 +29,15 @@
                     <div class="email">email<br> <br>
                         <input name="email" type="text" style="height: 30px; width: 220px;" >
                     </div> 
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                            {{ message }}
+                            </div>
+                        {% endfor %}
+                        {% endif %}
+                    {% endwith %}
                     <div class="phonenumber">phone number <br> <br>
                         <input name="phone_number" type="text" style="height: 30px; width: 220px;">
                     </div>
